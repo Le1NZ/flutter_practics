@@ -67,8 +67,8 @@ class _StudentIdCardNumber extends StatelessWidget {
       cardNumber,
       style: TextStyle(
         fontSize: 20,
-        color: Colors.black,
-        fontStyle: FontStyle.italic,
+        color: Colors.green,
+        fontWeight: FontWeight.bold,
       ),
       textAlign: TextAlign.center,
     );
