@@ -11,13 +11,11 @@ class HomeScreen extends StatelessWidget {
         spacing: 8,
         children: [
           const _Name(),
-          const _GroupNumber(),
-          const _StudentIdCardNumber(),
-          const SizedBox(
-            width: 100,
-            height: 150,
-            child: Text("Text in SizedBox"),
+          Padding(
+            padding: EdgeInsets.only(left: 0, right: 0, top: 32, bottom: 16),
+            child: const _GroupNumber(),
           ),
+          const _StudentIdCardNumber(),
           const _TestButton(),
         ],
       ),
