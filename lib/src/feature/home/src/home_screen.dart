@@ -6,7 +6,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 8,
         children: [
