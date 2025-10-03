@@ -5,7 +5,13 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Container(
+      alignment: Alignment.center,
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.cyanAccent,
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 8,
