@@ -6,18 +6,15 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 8,
-          children: [
-            const _Name(),
-            const _GroupNumber(),
-            const _StudentIdCardNumber(),
-            const _TestButton(),
-          ],
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 8,
+        children: [
+          const _Name(),
+          const _GroupNumber(),
+          const _StudentIdCardNumber(),
+          const _TestButton(),
+        ],
       ),
     );
   }
