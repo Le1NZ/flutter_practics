@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_project/src/feature/food/food_screen.dart';
+
 class FeedScreen extends StatefulWidget {
   final int initialHunger;
 
@@ -42,6 +44,10 @@ class _FeedScreenState extends State<FeedScreen> {
     Navigator.pop(context, _currentHunger);
   }
 
+  void _onFoodPressed() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => FoodScreen()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,6 +68,11 @@ class _FeedScreenState extends State<FeedScreen> {
             ElevatedButton(
               onPressed: _decreaseHunger,
               child: const Text('Пусть поголодает (-10)'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _onFoodPressed,
+              child: const Text('Виды еды'),
             ),
             const SizedBox(height: 40),
             ElevatedButton(
