@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_project/src/feature/game/game_screen.dart';
+
 class PlayScreen extends StatefulWidget {
   final int initialHappiness;
 
@@ -34,6 +36,10 @@ class _PlayScreenState extends State<PlayScreen> {
     Navigator.pop(context, _currentHappiness);
   }
 
+  void _onGameListPressed() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => GameScreen()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +60,11 @@ class _PlayScreenState extends State<PlayScreen> {
             ElevatedButton(
               onPressed: _decreaseHappiness,
               child: const Text('Загрустить (-10)'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _onGameListPressed,
+              child: const Text('Виды игр'),
             ),
             const SizedBox(height: 40),
             ElevatedButton(
