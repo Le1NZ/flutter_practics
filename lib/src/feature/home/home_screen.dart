@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/src/feature/feed/feed.dart';
-import 'package:flutter_project/src/feature/play/play.dart';
-import 'package:flutter_project/src/feature/stats/stats.dart';
-import 'package:flutter_project/src/feature/toy/toy.dart';
+import 'package:flutter_project/src/feature/feed/feed_screen.dart';
+import 'package:flutter_project/src/feature/play/play_screen.dart';
+import 'package:flutter_project/src/feature/stats/stats_screen.dart';
+import 'package:flutter_project/src/feature/toy/toy_screen.dart';
+import 'package:flutter_project/src/feature/toy/toys.dart';
+import 'package:flutter_project/src/feature/coloring/coloring_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -80,6 +82,15 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _navigateToColoringScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ColoringScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,6 +127,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ElevatedButton(
               onPressed: _navigateToStatsScreen,
               child: const Text('Посмотреть статистику'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _navigateToColoringScreen,
+              child: const Text('Варианты раскраски'),
             ),
           ],
         ),
