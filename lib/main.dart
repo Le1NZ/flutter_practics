@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_project/src/core/design/design.dart';
-import 'package:flutter_project/src/feature/home/home.dart';
+import 'package:flutter_project/src/feature/home/home_screen.dart';
 
 void main() {
   runApp(const MyApp());
