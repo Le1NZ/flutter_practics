@@ -4,6 +4,8 @@ import 'package:flutter_project/feature/pet_info/model/pet_state.dart';
 import 'package:flutter_project/feature/pet_info/model/user_info.dart';
 import 'package:flutter_project/feature/store/store.dart';
 
+import '../../../shared/components/progress_bar.dart';
+
 class PetInfoContainer extends StatefulWidget {
   final PetInfo _petInfo;
 
@@ -20,16 +22,25 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
   final List<StoreItem> _storeItems = [
     StoreItem(id: '1', name: 'Обычный корм', price: 10, wasBought: false),
     StoreItem(id: '2', name: 'Премиум-консервы', price: 25, wasBought: false),
-    StoreItem(id: '3', name: 'Хрустящее лакомство', price: 15, wasBought: false),
+    StoreItem(
+      id: '3',
+      name: 'Хрустящее лакомство',
+      price: 15,
+      wasBought: false,
+    ),
     StoreItem(id: '4', name: 'Красный мячик', price: 20, wasBought: false),
     StoreItem(id: '5', name: 'Заводная мышка', price: 35, wasBought: false),
     StoreItem(id: '6', name: 'Удобная лежанка', price: 100, wasBought: false),
-    StoreItem(id: '7', name: 'Энергетик для питомца', price: 50, wasBought: false),
+    StoreItem(
+      id: '7',
+      name: 'Энергетик для питомца',
+      price: 50,
+      wasBought: false,
+    ),
     StoreItem(id: '8', name: 'Стильный ошейник', price: 75, wasBought: false),
     StoreItem(id: '9', name: 'Забавный бантик', price: 60, wasBought: false),
     StoreItem(id: '10', name: 'Пищалка', price: 150, wasBought: false),
   ];
-
 
   void _onFeedPressed() {
     setState(() {
@@ -104,9 +115,9 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
         _helpText("Имя питомца: ${widget._petInfo.name}"),
         _helpText(widget._petInfo.type),
         _helpText("Сытость:"),
-        _ProgressBar(value: _petState.hungry),
+        ProgressBar(value: _petState.hungry),
         _helpText("Счастье:"),
-        _ProgressBar(value: _petState.happiness),
+        ProgressBar(value: _petState.happiness),
         ElevatedButton(
           onPressed: () => _onFeedPressed(),
           child: const Text('Покормить'),
@@ -129,18 +140,5 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
       text,
       style: const TextStyle(fontSize: 16.0, color: Colors.black),
     );
-  }
-}
-
-class _ProgressBar extends StatelessWidget {
-  final int value;
-
-  const _ProgressBar({required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    final doubleValue = value / 100.0;
-    final currValue = doubleValue.clamp(0.0, 1.0);
-    return LinearProgressIndicator(value: currValue);
   }
 }
