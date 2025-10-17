@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/feature/pet_info/pet_info.dart';
 
 class CreatePetScreen extends StatelessWidget {
   final _nameTextController = TextEditingController();
@@ -11,14 +12,24 @@ class CreatePetScreen extends StatelessWidget {
       _showErrorSnackBar(context);
       return;
     }
-    // TODO navigate to main screen
+
+    final petInfo = PetInfo(
+      name: _nameTextController.text,
+      type: _typeTextController.text,
+    );
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => PetInfoContainer(petInfo: petInfo),
+      ),
+    );
   }
 
   void _showErrorSnackBar(BuildContext context) {
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Введите имя и тип питомца')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Введите имя и тип питомца')));
   }
 
   @override
