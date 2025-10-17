@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/feature/pet_info/pet_info.dart';
 
+import '../../../shared/snackbar.dart';
+
 class CreatePetScreen extends StatelessWidget {
   final _nameTextController = TextEditingController();
   final _typeTextController = TextEditingController();
@@ -9,7 +11,7 @@ class CreatePetScreen extends StatelessWidget {
 
   void _onCreatePetPressed(BuildContext context) {
     if (_nameTextController.text.isEmpty || _typeTextController.text.isEmpty) {
-      _showErrorSnackBar(context);
+      showSnackBarWithText(context, 'Введите имя и тип питомца');
       return;
     }
 
@@ -23,13 +25,6 @@ class CreatePetScreen extends StatelessWidget {
         builder: (context) => PetInfoContainer(petInfo: petInfo),
       ),
     );
-  }
-
-  void _showErrorSnackBar(BuildContext context) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Введите имя и тип питомца')));
   }
 
   @override
