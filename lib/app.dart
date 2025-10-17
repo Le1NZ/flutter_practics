@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/shared/app_theme.dart';
+import 'package:flutter_project/feature/create_pet/create_pet.dart';
 
 class PetApp extends StatelessWidget {
 
@@ -12,7 +13,7 @@ class PetApp extends StatelessWidget {
     return MaterialApp(
       title: _appTitle,
       theme: appTheme,
-      home: Center(),
+      home: CreatePetScreen(),
     );
   }
 }
