@@ -45,6 +45,7 @@ class StoreScreen extends StatelessWidget {
           key: ValueKey(item),
           name: item.name,
           price: item.price,
+          imageUrl: item.imageUrl,
           state: _resolveItemState(items[index]),
           onBuyPressed: () {
             onBuyPressed(item.id);
