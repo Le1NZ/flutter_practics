@@ -1,23 +1,38 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_project/feature/create_pet/model/pet_type.dart';
 import 'package:flutter_project/feature/pet_info/pet_info.dart';
 
 import '../../../shared/snackbar.dart';
 
-class CreatePetScreen extends StatelessWidget {
-  final _nameTextController = TextEditingController();
-  final _typeTextController = TextEditingController();
+class CreatePetScreen extends StatefulWidget {
+  const CreatePetScreen({super.key});
 
-  CreatePetScreen({super.key});
+  @override
+  State<CreatePetScreen> createState() => _CreatePetScreenState();
+}
+
+class _CreatePetScreenState extends State<CreatePetScreen> {
+  final _nameTextController = TextEditingController();
+
+  final petTypes = allPetTypes;
+  late PetType _selectedType;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedType = petTypes.first;
+  }
 
   void _onCreatePetPressed(BuildContext context) {
-    if (_nameTextController.text.isEmpty || _typeTextController.text.isEmpty) {
+    if (_nameTextController.text.isEmpty) {
       showSnackBarWithText(context, 'Введите имя и тип питомца');
       return;
     }
 
     final petInfo = PetInfo(
       name: _nameTextController.text,
-      type: _typeTextController.text,
+      type: _selectedType.name,
     );
 
     Navigator.of(context).pushReplacement(
@@ -32,7 +47,7 @@ class CreatePetScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Создание питомца')),
       body: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Center(child: _creatingColumn(context)),
       ),
     );
@@ -44,8 +59,9 @@ class CreatePetScreen extends StatelessWidget {
       children: [
         _helpText('Введите имя питомца:'),
         _textField(_nameTextController, 'Имя'),
-        _helpText('Введите тип питомца:'),
-        _textField(_typeTextController, 'Тип'),
+        _helpText('Выберите тип питомца:'),
+        _dropdownMenu(),
+        _petImage(_selectedType.imageUrl),
         ElevatedButton(
           onPressed: () => _onCreatePetPressed(context),
           child: const Text('Создать питомца'),
@@ -65,6 +81,34 @@ class CreatePetScreen extends StatelessWidget {
         hintText: hintText,
         border: OutlineInputBorder(),
       ),
+    );
+  }
+
+  Widget _dropdownMenu() {
+    return DropdownButton<PetType>(
+      value: _selectedType,
+      items: petTypes.map<DropdownMenuItem<PetType>>((PetType value) {
+        return DropdownMenuItem<PetType>(value: value, child: Text(value.name));
+      }).toList(),
+      onChanged: (PetType? newValue) {
+        setState(() {
+          if (newValue != null) {
+            _selectedType = newValue;
+          }
+        });
+      },
+    );
+  }
+
+  Widget _petImage(String url) {
+    return CachedNetworkImage(
+      height: 100,
+      fit: BoxFit.fitHeight,
+      imageUrl: url,
+      progressIndicatorBuilder: (context, url, progress) =>
+          Center(child: CircularProgressIndicator()),
+      errorWidget: (context, url, error) =>
+          Icon(Icons.error, color: Colors.red),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../shared/snackbar.dart';
@@ -7,6 +8,7 @@ class StoreItemView extends StatelessWidget {
   final String name;
   final int price;
   final StoreItemState state;
+  final String imageUrl;
   final VoidCallback onBuyPressed;
 
   const StoreItemView({
@@ -15,6 +17,7 @@ class StoreItemView extends StatelessWidget {
     required this.price,
     required this.state,
     required this.onBuyPressed,
+    required this.imageUrl,
   });
 
   @override
@@ -27,7 +30,13 @@ class StoreItemView extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _info(),
+        Row(
+          spacing: 16,
+          children: [
+            _info(),
+            _itemImage(imageUrl),
+          ],
+        ),
         ElevatedButton(
           onPressed: onPressedCallback,
           child: Text(_resolveButtonText()),
@@ -49,6 +58,18 @@ class StoreItemView extends StatelessWidget {
           style: TextStyle(fontSize: 14.0),
         ),
       ],
+    );
+  }
+
+  Widget _itemImage(String url) {
+    return CachedNetworkImage(
+      height: 100,
+      fit: BoxFit.fitHeight,
+      imageUrl: url,
+      progressIndicatorBuilder: (context, url, progress) =>
+          Center(child: CircularProgressIndicator()),
+      errorWidget: (context, url, error) =>
+          Icon(Icons.error, color: Colors.red),
     );
   }
 
