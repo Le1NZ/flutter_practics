@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_project/feature/pet_info/model/pet_info.dart';
 import 'package:flutter_project/feature/pet_info/model/pet_state.dart';
 import 'package:flutter_project/feature/pet_info/model/user_info.dart';
+import 'package:flutter_project/feature/pet_settings/pet_settings.dart';
 import 'package:flutter_project/feature/store/store.dart';
 
 import '../../../shared/components/progress_bar.dart';
@@ -19,7 +20,15 @@ class PetInfoContainer extends StatefulWidget {
 class _PetInfoContainerState extends State<PetInfoContainer> {
   UserInfo _userInfo = UserInfo(money: 50);
   PetState _petState = PetState(hungry: 50, happiness: 50);
+  late PetInfo _petInfo;
+
   final List<StoreItem> _storeItems = allStoreItems;
+
+  @override
+  void initState() {
+    super.initState();
+    _petInfo = widget._petInfo;
+  }
 
   void _onFeedPressed() {
     setState(() {
@@ -65,6 +74,24 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
     });
   }
 
+  void _onNavigateToSettingsPressed() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => PetSettingsScreen(
+          info: _petInfo,
+          state: _petState,
+          onSaveClick: _onNameUpdate,
+        ),
+      ),
+    );
+  }
+
+  void _onNameUpdate(String name) {
+    setState(() {
+      _petInfo = _petInfo.copyWith(name: name);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,8 +118,8 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
     return Column(
       spacing: 16,
       children: [
-        _helpText("Имя питомца: ${widget._petInfo.name}"),
-        _helpText(widget._petInfo.type),
+        _helpText("Имя питомца: ${_petInfo.name}"),
+        _helpText(_petInfo.type),
         _helpText("Сытость:"),
         ProgressBar(value: _petState.hungry),
         _helpText("Счастье:"),
@@ -109,6 +136,10 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
         ElevatedButton(
           onPressed: () => _onNavigateToStorePressed(),
           child: const Text('В магазин'),
+        ),
+        ElevatedButton(
+          onPressed: () => _onNavigateToSettingsPressed(),
+          child: const Text('К настройкам'),
         ),
       ],
     );
