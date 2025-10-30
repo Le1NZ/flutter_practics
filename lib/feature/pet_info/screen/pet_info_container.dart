@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/feature/end_game/end_game.dart';
 import 'package:flutter_project/feature/pet_info/model/pet_info.dart';
 import 'package:flutter_project/feature/pet_info/model/pet_state.dart';
 import 'package:flutter_project/feature/pet_info/model/user_info.dart';
@@ -28,6 +29,32 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
   void initState() {
     super.initState();
     _petInfo = widget._petInfo;
+  }
+
+  @override
+  void setState(VoidCallback callback) {
+    super.setState(callback);
+    checkCondition();
+  }
+
+  void checkCondition() {
+    final hungry = _petState.hungry;
+    final happiness = _petState.happiness;
+    final allBought = _storeItems.where((item) => !item.wasBought).isEmpty;
+
+    if (hungry <= 0 || happiness <= 0 || _userInfo.money <= 0) {
+      _onNavigateToEndGame(false);
+    } else if (allBought && (hungry >= 100 || happiness >= 100)) {
+      _onNavigateToEndGame(true);
+    }
+  }
+
+  void _onNavigateToEndGame(bool wasWin) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => EndGameScreen(petInfo: _petInfo, wasWin: wasWin),
+      ),
+    );
   }
 
   void _onFeedPressed() {
