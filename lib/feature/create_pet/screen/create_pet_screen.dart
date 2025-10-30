@@ -35,7 +35,8 @@ class _CreatePetScreenState extends State<CreatePetScreen> {
       type: _selectedType.name,
     );
 
-    Navigator.of(context).pushReplacement(
+    Navigator.pushReplacement(
+      context,
       MaterialPageRoute(
         builder: (context) => PetInfoContainer(petInfo: petInfo),
       ),

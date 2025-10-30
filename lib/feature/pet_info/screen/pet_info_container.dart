@@ -50,7 +50,8 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
   }
 
   void _onNavigateToEndGame(bool wasWin) {
-    Navigator.of(context).pushReplacement(
+    Navigator.pushReplacement(
+      context,
       MaterialPageRoute(
         builder: (context) => EndGameScreen(petInfo: _petInfo, wasWin: wasWin),
       ),
@@ -80,7 +81,8 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
   }
 
   void _onNavigateToStorePressed() {
-    Navigator.of(context).push(
+    Navigator.push(
+      context,
       MaterialPageRoute(
         builder: (context) => StoreScreen(
           availableMoney: _userInfo.money,
@@ -102,7 +104,8 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
   }
 
   void _onNavigateToSettingsPressed() {
-    Navigator.of(context).push(
+    Navigator.push(
+      context,
       MaterialPageRoute(
         builder: (context) => PetSettingsScreen(
           info: _petInfo,

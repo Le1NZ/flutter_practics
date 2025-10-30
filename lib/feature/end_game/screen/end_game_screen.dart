@@ -16,7 +16,8 @@ class EndGameScreen extends StatelessWidget {
       allStoreItems[index] = newItem;
     }
 
-    Navigator.of(context).pushReplacement(
+    Navigator.pushReplacement(
+      context,
       MaterialPageRoute(builder: (context) => CreatePetScreen()),
     );
   }
