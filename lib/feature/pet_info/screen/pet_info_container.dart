@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/feature/end_game/end_game.dart';
 import 'package:flutter_project/feature/pet_info/model/pet_info.dart';
 import 'package:flutter_project/feature/pet_info/model/pet_state.dart';
 import 'package:flutter_project/feature/pet_info/model/user_info.dart';
-import 'package:flutter_project/feature/pet_settings/pet_settings.dart';
 import 'package:flutter_project/feature/store/store.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../shared/components/progress_bar.dart';
 
@@ -33,8 +32,8 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
 
   @override
   void setState(VoidCallback callback) {
-    super.setState(callback);
     checkCondition();
+    super.setState(callback);
   }
 
   void checkCondition() {
@@ -50,11 +49,12 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
   }
 
   void _onNavigateToEndGame(bool wasWin) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EndGameScreen(petInfo: _petInfo, wasWin: wasWin),
-      ),
+    context.pushReplacement(
+      '/end-game',
+      extra: {
+        'petInfo': _petInfo,
+        'wasWin': wasWin,
+      },
     );
   }
 
@@ -81,15 +81,13 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
   }
 
   void _onNavigateToStorePressed() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => StoreScreen(
-          availableMoney: _userInfo.money,
-          items: _storeItems,
-          onBuyPressed: _onBuyItem,
-        ),
-      ),
+    context.push(
+      '/store',
+      extra: {
+        'availableMoney': _userInfo.money,
+        'items': _storeItems,
+        'onBuyPressed': _onBuyItem,
+      },
     );
   }
 
@@ -104,15 +102,13 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
   }
 
   void _onNavigateToSettingsPressed() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PetSettingsScreen(
-          info: _petInfo,
-          state: _petState,
-          onSaveClick: _onNameUpdate,
-        ),
-      ),
+    context.push(
+      '/pet-settings',
+      extra: {
+        'info': _petInfo,
+        'state': _petState,
+        'onSaveClick': _onNameUpdate,
+      },
     );
   }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/feature/create_pet/create_pet.dart';
 import 'package:flutter_project/feature/pet_info/pet_info.dart';
 import 'package:flutter_project/feature/store/model/store_item.dart';
+import 'package:go_router/go_router.dart';
 
 class EndGameScreen extends StatelessWidget {
   final bool wasWin;
@@ -16,10 +16,7 @@ class EndGameScreen extends StatelessWidget {
       allStoreItems[index] = newItem;
     }
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => CreatePetScreen()),
-    );
+    context.pushReplacement('/create-pet', extra: petInfo);
   }
 
   @override

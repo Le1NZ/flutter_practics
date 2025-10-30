@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/feature/pet_info/pet_info.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../shared/snackbar.dart';
 
@@ -35,7 +36,7 @@ class _PetSettingsScreenState extends State<PetSettingsScreen> {
     }
 
     widget.onSaveClick(_nameTextController.text);
-    Navigator.pop(context);
+    context.pop();
   }
 
   @override
