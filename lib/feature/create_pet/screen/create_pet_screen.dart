@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_project/feature/create_pet/model/pet_type.dart';
 import 'package:flutter_project/feature/pet_info/pet_info.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../shared/snackbar.dart';
 
@@ -35,10 +36,11 @@ class _CreatePetScreenState extends State<CreatePetScreen> {
       type: _selectedType.name,
     );
 
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => PetInfoContainer(petInfo: petInfo),
-      ),
+    context.pushReplacement(
+      '/pet-info',
+      extra: {
+        'petInfo': petInfo,
+      },
     );
   }
 

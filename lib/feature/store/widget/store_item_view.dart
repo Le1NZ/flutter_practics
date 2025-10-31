@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../shared/snackbar.dart';
 import '../model/store_item_state.dart';
@@ -30,13 +31,7 @@ class StoreItemView extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          spacing: 16,
-          children: [
-            _info(),
-            _itemImage(imageUrl),
-          ],
-        ),
+        Row(spacing: 16, children: [_info(), _itemImage(imageUrl)]),
         ElevatedButton(
           onPressed: onPressedCallback,
           child: Text(_resolveButtonText()),
@@ -78,7 +73,7 @@ class StoreItemView extends StatelessWidget {
       StoreItemState.canBuy => () {
         onBuyPressed();
         showSnackBarWithText(context, "Куплено: $name");
-        Navigator.pop(context);
+        context.pop();
       },
       StoreItemState.bought => null,
       StoreItemState.cannotBuy => null,

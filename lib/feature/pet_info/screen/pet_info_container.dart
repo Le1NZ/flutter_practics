@@ -3,6 +3,7 @@ import 'package:flutter_project/feature/pet_info/model/pet_info.dart';
 import 'package:flutter_project/feature/pet_info/model/pet_state.dart';
 import 'package:flutter_project/feature/pet_info/model/user_info.dart';
 import 'package:flutter_project/feature/store/store.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../shared/components/progress_bar.dart';
 
@@ -19,7 +20,43 @@ class PetInfoContainer extends StatefulWidget {
 class _PetInfoContainerState extends State<PetInfoContainer> {
   UserInfo _userInfo = UserInfo(money: 50);
   PetState _petState = PetState(hungry: 50, happiness: 50);
+  late PetInfo _petInfo;
+
   final List<StoreItem> _storeItems = allStoreItems;
+
+  @override
+  void initState() {
+    super.initState();
+    _petInfo = widget._petInfo;
+  }
+
+  @override
+  void setState(VoidCallback callback) {
+    checkCondition();
+    super.setState(callback);
+  }
+
+  void checkCondition() {
+    final hungry = _petState.hungry;
+    final happiness = _petState.happiness;
+    final allBought = _storeItems.where((item) => !item.wasBought).isEmpty;
+
+    if (hungry <= 0 || happiness <= 0 || _userInfo.money <= 0) {
+      _onNavigateToEndGame(false);
+    } else if (allBought && (hungry >= 100 || happiness >= 100)) {
+      _onNavigateToEndGame(true);
+    }
+  }
+
+  void _onNavigateToEndGame(bool wasWin) {
+    context.pushReplacement(
+      '/end-game',
+      extra: {
+        'petInfo': _petInfo,
+        'wasWin': wasWin,
+      },
+    );
+  }
 
   void _onFeedPressed() {
     setState(() {
@@ -44,14 +81,13 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
   }
 
   void _onNavigateToStorePressed() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => StoreScreen(
-          availableMoney: _userInfo.money,
-          items: _storeItems,
-          onBuyPressed: _onBuyItem,
-        ),
-      ),
+    context.push(
+      '/store',
+      extra: {
+        'availableMoney': _userInfo.money,
+        'items': _storeItems,
+        'onBuyPressed': _onBuyItem,
+      },
     );
   }
 
@@ -62,6 +98,23 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
       final newItem = item.copyWith(wasBought: true);
       _storeItems[itemIndex] = newItem;
       _userInfo = _userInfo.copyWith(money: _userInfo.money - item.price);
+    });
+  }
+
+  void _onNavigateToSettingsPressed() {
+    context.push(
+      '/pet-settings',
+      extra: {
+        'info': _petInfo,
+        'state': _petState,
+        'onSaveClick': _onNameUpdate,
+      },
+    );
+  }
+
+  void _onNameUpdate(String name) {
+    setState(() {
+      _petInfo = _petInfo.copyWith(name: name);
     });
   }
 
@@ -91,8 +144,8 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
     return Column(
       spacing: 16,
       children: [
-        _helpText("Имя питомца: ${widget._petInfo.name}"),
-        _helpText(widget._petInfo.type),
+        _helpText("Имя питомца: ${_petInfo.name}"),
+        _helpText(_petInfo.type),
         _helpText("Сытость:"),
         ProgressBar(value: _petState.hungry),
         _helpText("Счастье:"),
@@ -109,6 +162,10 @@ class _PetInfoContainerState extends State<PetInfoContainer> {
         ElevatedButton(
           onPressed: () => _onNavigateToStorePressed(),
           child: const Text('В магазин'),
+        ),
+        ElevatedButton(
+          onPressed: () => _onNavigateToSettingsPressed(),
+          child: const Text('К настройкам'),
         ),
       ],
     );
