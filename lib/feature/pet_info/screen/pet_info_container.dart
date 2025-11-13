@@ -1,170 +1,94 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/feature/pet_info/model/pet_info.dart';
-import 'package:flutter_project/feature/pet_info/model/pet_state.dart';
-import 'package:flutter_project/feature/pet_info/model/user_info.dart';
-import 'package:flutter_project/feature/store/store.dart';
+import 'package:flutter_project/shared/di/pet_state.dart';
+import 'package:flutter_project/shared/di/user_state.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/components/progress_bar.dart';
 
-class PetInfoContainer extends StatefulWidget {
-  final PetInfo _petInfo;
+class PetInfoContainer extends StatelessWidget {
+  const PetInfoContainer({super.key});
 
-  const PetInfoContainer({super.key, required PetInfo petInfo})
-    : _petInfo = petInfo;
+  void checkCondition(BuildContext context) {
+    final petState = PetState.of(context);
+    final userState = UserState.of(context);
 
-  @override
-  State<StatefulWidget> createState() => _PetInfoContainerState();
-}
+    final hungry = petState.petStatus.hungry;
+    final happiness = petState.petStatus.happiness;
+    final allBought = userState.storeItems
+        .where((item) => !item.wasBought)
+        .isEmpty;
 
-class _PetInfoContainerState extends State<PetInfoContainer> {
-  UserInfo _userInfo = UserInfo(money: 50);
-  PetState _petState = PetState(hungry: 50, happiness: 50);
-  late PetInfo _petInfo;
-
-  final List<StoreItem> _storeItems = allStoreItems;
-
-  @override
-  void initState() {
-    super.initState();
-    _petInfo = widget._petInfo;
-  }
-
-  @override
-  void setState(VoidCallback callback) {
-    checkCondition();
-    super.setState(callback);
-  }
-
-  void checkCondition() {
-    final hungry = _petState.hungry;
-    final happiness = _petState.happiness;
-    final allBought = _storeItems.where((item) => !item.wasBought).isEmpty;
-
-    if (hungry <= 0 || happiness <= 0 || _userInfo.money <= 0) {
-      _onNavigateToEndGame(false);
+    if (hungry <= 0 || happiness <= 0 || userState.userInfo.money <= 0) {
+      _onNavigateToEndGame(context, false);
     } else if (allBought && (hungry >= 100 || happiness >= 100)) {
-      _onNavigateToEndGame(true);
+      _onNavigateToEndGame(context, true);
     }
   }
 
-  void _onNavigateToEndGame(bool wasWin) {
-    context.pushReplacement(
-      '/end-game',
-      extra: {
-        'petInfo': _petInfo,
-        'wasWin': wasWin,
-      },
-    );
+  void _onNavigateToEndGame(BuildContext context, bool wasWin) {
+    context.pushReplacement('/end-game', extra: wasWin);
   }
 
-  void _onFeedPressed() {
-    setState(() {
-      _petState = _petState.copyWith(
-        hungry: _petState.hungry + 10,
-        happiness: _petState.happiness - 5,
-      );
-
-      _userInfo = _userInfo.copyWith(money: _userInfo.money - 10);
-    });
+  void _onNavigateToStorePressed(BuildContext context) {
+    context.push('/store');
   }
 
-  void _onPlayPressed() {
-    setState(() {
-      _petState = _petState.copyWith(
-        hungry: _petState.hungry - 7,
-        happiness: _petState.happiness + 5,
-      );
-
-      _userInfo = _userInfo.copyWith(money: _userInfo.money + 15);
-    });
-  }
-
-  void _onNavigateToStorePressed() {
-    context.push(
-      '/store',
-      extra: {
-        'availableMoney': _userInfo.money,
-        'items': _storeItems,
-        'onBuyPressed': _onBuyItem,
-      },
-    );
-  }
-
-  void _onBuyItem(String id) {
-    setState(() {
-      final item = _storeItems.firstWhere((item) => item.id == id);
-      final itemIndex = _storeItems.indexOf(item);
-      final newItem = item.copyWith(wasBought: true);
-      _storeItems[itemIndex] = newItem;
-      _userInfo = _userInfo.copyWith(money: _userInfo.money - item.price);
-    });
-  }
-
-  void _onNavigateToSettingsPressed() {
-    context.push(
-      '/pet-settings',
-      extra: {
-        'info': _petInfo,
-        'state': _petState,
-        'onSaveClick': _onNameUpdate,
-      },
-    );
-  }
-
-  void _onNameUpdate(String name) {
-    setState(() {
-      _petInfo = _petInfo.copyWith(name: name);
-    });
+  void _onNavigateToSettingsPressed(BuildContext context) {
+    context.push('/pet-settings');
   }
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => checkCondition(context),
+    );
+
     return Scaffold(
-      appBar: AppBar(title: Text("Информация о питомце")),
-      body: _screenColumn(),
+      appBar: AppBar(title: const Text("Информация о питомце")),
+      body: _screenColumn(context),
     );
   }
 
-  Widget _screenColumn() {
+  Widget _screenColumn(BuildContext context) {
     return Column(
       spacing: 32,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _helpText("Монеты: ${_userInfo.money}"),
+        _helpText("Монеты: ${UserState.of(context).userInfo.money}"),
         Padding(
-          padding: EdgeInsets.all(16),
-          child: Center(child: _infoColumn()),
+          padding: const EdgeInsets.all(16),
+          child: Center(child: _infoColumn(context)),
         ),
       ],
     );
   }
 
-  Widget _infoColumn() {
+  Widget _infoColumn(BuildContext context) {
+    final petState = PetState.of(context);
     return Column(
       spacing: 16,
       children: [
-        _helpText("Имя питомца: ${_petInfo.name}"),
-        _helpText(_petInfo.type),
+        _helpText("Имя питомца: ${petState.petInfo.name}"),
+        _helpText(petState.petInfo.type),
         _helpText("Сытость:"),
-        ProgressBar(value: _petState.hungry),
+        ProgressBar(value: petState.petStatus.hungry),
         _helpText("Счастье:"),
-        ProgressBar(value: _petState.happiness),
+        ProgressBar(value: petState.petStatus.happiness),
         ElevatedButton(
-          onPressed: () => _onFeedPressed(),
+          onPressed: petState.onFeed,
           child: const Text('Покормить'),
         ),
         ElevatedButton(
-          onPressed: () => _onPlayPressed(),
+          onPressed: petState.onPlay,
           child: const Text('Поиграть'),
         ),
-        SizedBox(height: 40),
+        const SizedBox(height: 40),
         ElevatedButton(
-          onPressed: () => _onNavigateToStorePressed(),
+          onPressed: () => _onNavigateToStorePressed(context),
           child: const Text('В магазин'),
         ),
         ElevatedButton(
-          onPressed: () => _onNavigateToSettingsPressed(),
+          onPressed: () => _onNavigateToSettingsPressed(context),
           child: const Text('К настройкам'),
         ),
       ],

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/feature/pet_info/pet_info.dart';
 import 'package:flutter_project/feature/store/model/store_item.dart';
+import 'package:flutter_project/shared/di/pet_state.dart';
+import 'package:flutter_project/shared/di/user_state.dart';
 import 'package:go_router/go_router.dart';
 
 class EndGameScreen extends StatelessWidget {
   final bool wasWin;
-  final PetInfo petInfo;
 
-  const EndGameScreen({super.key, required this.wasWin, required this.petInfo});
+  const EndGameScreen({super.key, required this.wasWin});
 
   void _onStartNewGameClick(BuildContext context) {
     for (var item in allStoreItems) {
@@ -15,15 +15,21 @@ class EndGameScreen extends StatelessWidget {
       final index = allStoreItems.indexOf(item);
       allStoreItems[index] = newItem;
     }
+    
+    PetState.of(context).resetState();
+    UserState.of(context).resetState();
 
-    context.pushReplacement('/create-pet', extra: petInfo);
+    context.pushReplacement('/create-pet');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Конец игры")),
-      body: Padding(padding: EdgeInsets.all(16), child: _info(context)),
+      appBar: AppBar(title: const Text("Конец игры")),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: _info(context),
+      ),
     );
   }
 
@@ -32,19 +38,21 @@ class EndGameScreen extends StatelessWidget {
   }
 
   Widget _column(BuildContext context) {
+    final petInfo = PetState.of(context).petInfo;
+
     return Column(
-      spacing: 16,
       children: [
-        Text("${petInfo.type} ${petInfo.name}", style: TextStyle(fontSize: 44)),
+        Text("${petInfo.type} ${petInfo.name}",
+            style: const TextStyle(fontSize: 44)),
         Text(
           (wasWin ? "победа" : "проигрыш").toUpperCase(),
-          style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
         ),
         ElevatedButton(
           onPressed: () {
             _onStartNewGameClick(context);
           },
-          child: Text("Заново"),
+          child: const Text("Заново"),
         ),
       ],
     );
