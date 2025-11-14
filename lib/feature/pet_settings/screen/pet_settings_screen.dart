@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/feature/pet_info/pet_info.dart';
+import 'package:flutter_project/shared/service/pet_service.dart';
+import 'package:flutter_project/shared/service_locator.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/snackbar.dart';
 
 class PetSettingsScreen extends StatefulWidget {
-  final PetInfo info;
-  final PetState state;
-  final Function(String name) onSaveClick;
-
   const PetSettingsScreen({
     super.key,
-    required this.info,
-    required this.state,
-    required this.onSaveClick,
   });
 
   @override
@@ -22,11 +16,12 @@ class PetSettingsScreen extends StatefulWidget {
 
 class _PetSettingsScreenState extends State<PetSettingsScreen> {
   final _nameTextController = TextEditingController();
+  final _petService = locator<PetService>();
 
   @override
   void initState() {
     super.initState();
-    _nameTextController.text = widget.info.name;
+    _nameTextController.text = _petService.petInfo.name;
   }
 
   void _onSavePressed() {
@@ -35,27 +30,32 @@ class _PetSettingsScreenState extends State<PetSettingsScreen> {
       return;
     }
 
-    widget.onSaveClick(_nameTextController.text);
+    setState(() {
+      _petService.updateName(_nameTextController.text);
+    });
     context.pop();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Настройки")),
-      body: Padding(padding: EdgeInsets.all(16), child: _info()),
+      appBar: AppBar(title: const Text("Настройки")),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: _info(),
+      ),
     );
   }
 
   Widget _info() {
     return Column(
-      spacing: 16,
       children: [
-        _textInfo("Тип: ${widget.info.type}"),
+        _textInfo("Тип: ${_petService.petInfo.type}"),
         _textField(_nameTextController, "Имя"),
-        _textInfo("Сытость: ${widget.state.hungry}/100"),
-        _textInfo("Счастье: ${widget.state.happiness}/100"),
-        ElevatedButton(onPressed: _onSavePressed, child: Text("Сохранить")),
+        _textInfo("Сытость: ${_petService.petStatus.hungry}/100"),
+        _textInfo("Счастье: ${_petService.petStatus.happiness}/100"),
+        ElevatedButton(
+            onPressed: _onSavePressed, child: const Text("Сохранить")),
       ],
     );
   }

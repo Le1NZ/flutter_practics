@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_project/feature/create_pet/model/pet_type.dart';
 import 'package:flutter_project/feature/pet_info/pet_info.dart';
+import 'package:flutter_project/shared/service/pet_service.dart';
+import 'package:flutter_project/shared/service_locator.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/snackbar.dart';
@@ -35,13 +37,8 @@ class _CreatePetScreenState extends State<CreatePetScreen> {
       name: _nameTextController.text,
       type: _selectedType.name,
     );
-
-    context.pushReplacement(
-      '/pet-info',
-      extra: {
-        'petInfo': petInfo,
-      },
-    );
+    locator<PetService>().setInitialPetInfo(petInfo);
+    context.pushReplacement('/pet-info');
   }
 
   @override
