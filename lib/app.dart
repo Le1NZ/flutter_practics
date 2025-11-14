@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_project/feature/create_pet/create_pet.dart';
 import 'package:flutter_project/feature/end_game/end_game.dart';
+import 'package:flutter_project/feature/pet_info/cubit/user_info_cubit.dart';
 import 'package:flutter_project/feature/pet_info/pet_info.dart';
 import 'package:flutter_project/feature/pet_settings/pet_settings.dart';
+import 'package:flutter_project/feature/store/cubit/store_cubit.dart';
 import 'package:flutter_project/feature/store/store.dart';
 import 'package:flutter_project/shared/app_theme.dart';
 import 'package:go_router/go_router.dart';
+
+import 'feature/pet_info/cubit/pet_cubit.dart';
 
 class PetApp extends StatelessWidget {
   final String _appTitle = 'Мой питомец';
@@ -28,10 +33,7 @@ class PetApp extends StatelessWidget {
         path: '/pet-settings',
         builder: (context, state) => const PetSettingsScreen(),
       ),
-      GoRoute(
-        path: '/store',
-        builder: (context, state) => const StoreScreen(),
-      ),
+      GoRoute(path: '/store', builder: (context, state) => const StoreScreen()),
       GoRoute(
         path: '/end-game',
         builder: (context, state) {
@@ -44,10 +46,21 @@ class PetApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: _appTitle,
-      theme: appTheme,
-      routerConfig: appRouterProvider,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => UserInfoCubit()),
+        BlocProvider(
+          create: (context) => PetCubit(context.read<UserInfoCubit>()),
+        ),
+        BlocProvider(
+          create: (context) => StoreCubit(context.read<UserInfoCubit>()),
+        ),
+      ],
+      child: MaterialApp.router(
+        title: _appTitle,
+        theme: appTheme,
+        routerConfig: appRouterProvider,
+      ),
     );
   }
 }

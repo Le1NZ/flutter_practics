@@ -15,13 +15,15 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.8
+  flutter_bloc: ^8.1.1
 
-  get_it: ^9.0.5
+  cupertino_icons: ^1.0.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  bloc_test: ^9.1.0
 
   flutter_lints: ^5.0.0
 

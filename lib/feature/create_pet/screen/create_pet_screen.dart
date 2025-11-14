@@ -1,66 +1,72 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_project/feature/create_pet/model/pet_type.dart';
-import 'package:flutter_project/feature/pet_info/pet_info.dart';
-import 'package:flutter_project/shared/service/pet_service.dart';
-import 'package:flutter_project/shared/service_locator.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_project/feature/create_pet/cubit/create_pet_cubit.dart';
+import 'package:flutter_project/feature/pet_info/cubit/user_info_cubit.dart';
+import 'package:flutter_project/feature/store/cubit/store_cubit.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/snackbar.dart';
+import '../../pet_info/cubit/pet_cubit.dart';
 
-class CreatePetScreen extends StatefulWidget {
+class CreatePetScreen extends StatelessWidget {
   const CreatePetScreen({super.key});
 
-  @override
-  State<CreatePetScreen> createState() => _CreatePetScreenState();
-}
-
-class _CreatePetScreenState extends State<CreatePetScreen> {
-  final _nameTextController = TextEditingController();
-
-  final petTypes = allPetTypes;
-  late PetType _selectedType;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedType = petTypes.first;
-  }
-
   void _onCreatePetPressed(BuildContext context) {
-    if (_nameTextController.text.isEmpty) {
-      showSnackBarWithText(context, 'Введите имя и тип питомца');
+    final createPetCubit = context.read<CreatePetCubit>();
+    if (createPetCubit.state.petName.isEmpty) {
+      showSnackBarWithText(context, 'Введите имя питомца');
       return;
     }
 
-    final petInfo = PetInfo(
-      name: _nameTextController.text,
-      type: _selectedType.name,
+    final petCubit = context.read<PetCubit>();
+    final userInfoCubit = context.read<UserInfoCubit>();
+    final storeCubit = context.read<StoreCubit>();
+
+    userInfoCubit.reset();
+    petCubit.reset();
+    storeCubit.reset();
+
+    petCubit.createPet(
+      name: createPetCubit.state.petName,
+      type: createPetCubit
+          .state
+          .petTypes[createPetCubit.state.selectedPetIndex]
+          .name,
     );
-    locator<PetService>().setInitialPetInfo(petInfo);
+
     context.pushReplacement('/pet-info');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Создание питомца')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Center(child: _creatingColumn(context)),
+    return BlocProvider(
+      create: (context) => CreatePetCubit(),
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Создание питомца')),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Center(
+            child: BlocBuilder<CreatePetCubit, CreatePetState>(
+              builder: (context, state) {
+                return _creatingColumn(context, state);
+              },
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _creatingColumn(BuildContext context) {
+  Widget _creatingColumn(BuildContext context, CreatePetState state) {
     return Column(
       spacing: 16,
       children: [
         _helpText('Введите имя питомца:'),
-        _textField(_nameTextController, 'Имя'),
+        _textField(context, 'Имя'),
         _helpText('Выберите тип питомца:'),
-        _dropdownMenu(),
-        _petImage(_selectedType.imageUrl),
+        _dropdownMenu(context, state),
+        _petImage(state.petTypes[state.selectedPetIndex].imageUrl),
         ElevatedButton(
           onPressed: () => _onCreatePetPressed(context),
           child: const Text('Создать питомца'),
@@ -73,9 +79,9 @@ class _CreatePetScreenState extends State<CreatePetScreen> {
     return Text(text, style: TextStyle(color: Colors.black, fontSize: 20));
   }
 
-  Widget _textField(TextEditingController controller, String hintText) {
+  Widget _textField(BuildContext context, String hintText) {
     return TextField(
-      controller: controller,
+      onChanged: (value) => context.read<CreatePetCubit>().setPetName(value),
       decoration: InputDecoration(
         hintText: hintText,
         border: OutlineInputBorder(),
@@ -83,18 +89,19 @@ class _CreatePetScreenState extends State<CreatePetScreen> {
     );
   }
 
-  Widget _dropdownMenu() {
-    return DropdownButton<PetType>(
-      value: _selectedType,
-      items: petTypes.map<DropdownMenuItem<PetType>>((PetType value) {
-        return DropdownMenuItem<PetType>(value: value, child: Text(value.name));
+  Widget _dropdownMenu(BuildContext context, CreatePetState state) {
+    return DropdownButton<int>(
+      value: state.selectedPetIndex,
+      items: state.petTypes.asMap().entries.map<DropdownMenuItem<int>>((entry) {
+        return DropdownMenuItem<int>(
+          value: entry.key,
+          child: Text(entry.value.name),
+        );
       }).toList(),
-      onChanged: (PetType? newValue) {
-        setState(() {
-          if (newValue != null) {
-            _selectedType = newValue;
-          }
-        });
+      onChanged: (int? newValue) {
+        if (newValue != null) {
+          context.read<CreatePetCubit>().selectPetType(newValue);
+        }
       },
     );
   }
@@ -105,9 +112,9 @@ class _CreatePetScreenState extends State<CreatePetScreen> {
       fit: BoxFit.fitHeight,
       imageUrl: url,
       progressIndicatorBuilder: (context, url, progress) =>
-          Center(child: CircularProgressIndicator()),
+          const Center(child: CircularProgressIndicator()),
       errorWidget: (context, url, error) =>
-          Icon(Icons.error, color: Colors.red),
+          const Icon(Icons.error, color: Colors.red),
     );
   }
 }
