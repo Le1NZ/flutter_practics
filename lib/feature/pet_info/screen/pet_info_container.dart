@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/shared/di/pet_state.dart';
-import 'package:flutter_project/shared/di/user_state.dart';
+import 'package:flutter_project/shared/service/pet_service.dart';
+import 'package:flutter_project/shared/service/user_service.dart';
+import 'package:flutter_project/shared/service_locator.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/components/progress_bar.dart';
 
-class PetInfoContainer extends StatelessWidget {
+class PetInfoContainer extends StatefulWidget {
   const PetInfoContainer({super.key});
 
-  void checkCondition(BuildContext context) {
-    final petState = PetState.of(context);
-    final userState = UserState.of(context);
+  @override
+  State<PetInfoContainer> createState() => _PetInfoContainerState();
+}
 
-    final hungry = petState.petStatus.hungry;
-    final happiness = petState.petStatus.happiness;
-    final allBought = userState.storeItems
+class _PetInfoContainerState extends State<PetInfoContainer> {
+  final _petService = locator<PetService>();
+  final _userService = locator<UserService>();
+
+  void _checkCondition(BuildContext context) {
+    final hungry = _petService.petStatus.hungry;
+    final happiness = _petService.petStatus.happiness;
+    final allBought = _userService.storeItems
         .where((item) => !item.wasBought)
         .isEmpty;
 
-    if (hungry <= 0 || happiness <= 0 || userState.userInfo.money <= 0) {
+    if (hungry <= 0 || happiness <= 0 || _userService.userInfo.money <= 0) {
       _onNavigateToEndGame(context, false);
     } else if (allBought && (hungry >= 100 || happiness >= 100)) {
       _onNavigateToEndGame(context, true);
@@ -30,17 +36,17 @@ class PetInfoContainer extends StatelessWidget {
   }
 
   void _onNavigateToStorePressed(BuildContext context) {
-    context.push('/store');
+    context.push('/store').then((_) => setState(() {}));
   }
 
   void _onNavigateToSettingsPressed(BuildContext context) {
-    context.push('/pet-settings');
+    context.push('/pet-settings').then((_) => setState(() {}));
   }
 
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => checkCondition(context),
+      (_) => _checkCondition(context),
     );
 
     return Scaffold(
@@ -54,7 +60,7 @@ class PetInfoContainer extends StatelessWidget {
       spacing: 32,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _helpText("Монеты: ${UserState.of(context).userInfo.money}"),
+        _helpText("Монеты: ${_userService.userInfo.money}"),
         Padding(
           padding: const EdgeInsets.all(16),
           child: Center(child: _infoColumn(context)),
@@ -64,22 +70,29 @@ class PetInfoContainer extends StatelessWidget {
   }
 
   Widget _infoColumn(BuildContext context) {
-    final petState = PetState.of(context);
     return Column(
       spacing: 16,
       children: [
-        _helpText("Имя питомца: ${petState.petInfo.name}"),
-        _helpText(petState.petInfo.type),
+        _helpText("Имя питомца: ${_petService.petInfo.name}"),
+        _helpText(_petService.petInfo.type),
         _helpText("Сытость:"),
-        ProgressBar(value: petState.petStatus.hungry),
+        ProgressBar(value: _petService.petStatus.hungry),
         _helpText("Счастье:"),
-        ProgressBar(value: petState.petStatus.happiness),
+        ProgressBar(value: _petService.petStatus.happiness),
         ElevatedButton(
-          onPressed: petState.onFeed,
+          onPressed: () {
+            setState(() {
+              _petService.feed();
+            });
+          },
           child: const Text('Покормить'),
         ),
         ElevatedButton(
-          onPressed: petState.onPlay,
+          onPressed: () {
+            setState(() {
+              _petService.play();
+            });
+          },
           child: const Text('Поиграть'),
         ),
         const SizedBox(height: 40),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/shared/di/pet_state.dart';
+import 'package:flutter_project/shared/service/pet_service.dart';
+import 'package:flutter_project/shared/service_locator.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/snackbar.dart';
@@ -15,12 +16,12 @@ class PetSettingsScreen extends StatefulWidget {
 
 class _PetSettingsScreenState extends State<PetSettingsScreen> {
   final _nameTextController = TextEditingController();
+  final _petService = locator<PetService>();
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final petState = PetState.of(context);
-    _nameTextController.text = petState.petInfo.name;
+  void initState() {
+    super.initState();
+    _nameTextController.text = _petService.petInfo.name;
   }
 
   void _onSavePressed() {
@@ -29,7 +30,9 @@ class _PetSettingsScreenState extends State<PetSettingsScreen> {
       return;
     }
 
-    PetState.of(context).onNameUpdate(_nameTextController.text);
+    setState(() {
+      _petService.updateName(_nameTextController.text);
+    });
     context.pop();
   }
 
@@ -45,13 +48,12 @@ class _PetSettingsScreenState extends State<PetSettingsScreen> {
   }
 
   Widget _info() {
-    final petState = PetState.of(context);
     return Column(
       children: [
-        _textInfo("Тип: ${petState.petInfo.type}"),
+        _textInfo("Тип: ${_petService.petInfo.type}"),
         _textField(_nameTextController, "Имя"),
-        _textInfo("Сытость: ${petState.petStatus.hungry}/100"),
-        _textInfo("Счастье: ${petState.petStatus.happiness}/100"),
+        _textInfo("Сытость: ${_petService.petStatus.hungry}/100"),
+        _textInfo("Счастье: ${_petService.petStatus.happiness}/100"),
         ElevatedButton(
             onPressed: _onSavePressed, child: const Text("Сохранить")),
       ],

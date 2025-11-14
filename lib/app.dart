@@ -5,7 +5,6 @@ import 'package:flutter_project/feature/pet_info/pet_info.dart';
 import 'package:flutter_project/feature/pet_settings/pet_settings.dart';
 import 'package:flutter_project/feature/store/store.dart';
 import 'package:flutter_project/shared/app_theme.dart';
-import 'package:flutter_project/shared/di/app_state_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class PetApp extends StatelessWidget {
@@ -45,12 +44,10 @@ class PetApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppStateProvider(
-      child: MaterialApp.router(
-        title: _appTitle,
-        theme: appTheme,
-        routerConfig: appRouterProvider,
-      ),
+    return MaterialApp.router(
+      title: _appTitle,
+      theme: appTheme,
+      routerConfig: appRouterProvider,
     );
   }
 }
