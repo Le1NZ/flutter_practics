@@ -1,61 +1,55 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/shared/service/pet_service.dart';
-import 'package:flutter_project/shared/service_locator.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_project/feature/pet_settings/cubit/pet_settings_cubit.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/snackbar.dart';
+import '../../pet_info/cubit/pet_cubit.dart';
 
-class PetSettingsScreen extends StatefulWidget {
-  const PetSettingsScreen({
-    super.key,
-  });
+class PetSettingsScreen extends StatelessWidget {
+  const PetSettingsScreen({super.key});
 
-  @override
-  State<StatefulWidget> createState() => _PetSettingsScreenState();
-}
-
-class _PetSettingsScreenState extends State<PetSettingsScreen> {
-  final _nameTextController = TextEditingController();
-  final _petService = locator<PetService>();
-
-  @override
-  void initState() {
-    super.initState();
-    _nameTextController.text = _petService.petInfo.name;
-  }
-
-  void _onSavePressed() {
-    if (_nameTextController.text.isEmpty) {
+  void _onSavePressed(BuildContext context) {
+    if (context.read<PetSettingsCubit>().savePetName()) {
+      context.pop();
+    } else {
       showSnackBarWithText(context, 'Введите корректное имя питомца');
-      return;
     }
-
-    setState(() {
-      _petService.updateName(_nameTextController.text);
-    });
-    context.pop();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Настройки")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: _info(),
+    return BlocProvider(
+      create: (context) => PetSettingsCubit(context.read<PetCubit>()),
+      child: Scaffold(
+        appBar: AppBar(title: const Text("Настройки")),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: BlocBuilder<PetSettingsCubit, PetSettingsState>(
+            builder: (context, state) {
+              return _info(context, state);
+            },
+          ),
+        ),
       ),
     );
   }
 
-  Widget _info() {
+  Widget _info(BuildContext context, PetSettingsState state) {
+    final petState = context.read<PetCubit>().state;
     return Column(
       children: [
-        _textInfo("Тип: ${_petService.petInfo.type}"),
-        _textField(_nameTextController, "Имя"),
-        _textInfo("Сытость: ${_petService.petStatus.hungry}/100"),
-        _textInfo("Счастье: ${_petService.petStatus.happiness}/100"),
+        if (petState.petInfo != null)
+          _textInfo("Тип: ${petState.petInfo!.type}"),
+        _textField(context, "Имя", state.petName),
+        if (petState.petStatus != null)
+          _textInfo("Сытость: ${petState.petStatus!.hungry}/100"),
+        if (petState.petStatus != null)
+          _textInfo("Счастье: ${petState.petStatus!.happiness}/100"),
         ElevatedButton(
-            onPressed: _onSavePressed, child: const Text("Сохранить")),
+          onPressed: () => _onSavePressed(context),
+          child: const Text("Сохранить"),
+        ),
       ],
     );
   }
@@ -64,9 +58,14 @@ class _PetSettingsScreenState extends State<PetSettingsScreen> {
     return Text(text);
   }
 
-  Widget _textField(TextEditingController controller, String hintText) {
-    return TextField(
-      controller: controller,
+  Widget _textField(
+    BuildContext context,
+    String hintText,
+    String initialValue,
+  ) {
+    return TextFormField(
+      initialValue: initialValue,
+      onChanged: (value) => context.read<PetSettingsCubit>().setPetName(value),
       decoration: InputDecoration(
         hintText: hintText,
         border: OutlineInputBorder(),
