@@ -46,6 +46,8 @@ class PetSettingsScreen extends StatelessWidget {
           _textInfo("Сытость: ${petState.petStatus!.hungry}/100"),
         if (petState.petStatus != null)
           _textInfo("Счастье: ${petState.petStatus!.happiness}/100"),
+        if (petState.petStatus != null)
+          _textInfo("Здоровье: ${petState.petStatus!.health}/100"),
         ElevatedButton(
           onPressed: () => _onSavePressed(context),
           child: const Text("Сохранить"),

@@ -7,6 +7,9 @@ import 'package:flutter_project/feature/pet_info/pet_info.dart';
 import 'package:flutter_project/feature/pet_settings/pet_settings.dart';
 import 'package:flutter_project/feature/store/cubit/store_cubit.dart';
 import 'package:flutter_project/feature/store/store.dart';
+import 'package:flutter_project/feature/minigame/minigame.dart';
+import 'package:flutter_project/feature/vet/vet.dart';
+import 'package:flutter_project/feature/tasks/tasks.dart';
 import 'package:flutter_project/shared/app_theme.dart';
 import 'package:go_router/go_router.dart';
 
@@ -34,6 +37,15 @@ class PetApp extends StatelessWidget {
         builder: (context, state) => const PetSettingsScreen(),
       ),
       GoRoute(path: '/store', builder: (context, state) => const StoreScreen()),
+      GoRoute(path: '/vet', builder: (context, state) => const VetScreen()),
+      GoRoute(path: '/tasks', builder: (context, state) => const TasksScreen()),
+      GoRoute(
+        path: '/minigame',
+        builder: (context, state) => BlocProvider(
+          create: (context) => MinigameCubit(context.read<UserInfoCubit>()),
+          child: const MinigameScreen(),
+        ),
+      ),
       GoRoute(
         path: '/end-game',
         builder: (context, state) {
@@ -51,6 +63,15 @@ class PetApp extends StatelessWidget {
         BlocProvider(create: (context) => UserInfoCubit()),
         BlocProvider(
           create: (context) => PetCubit(context.read<UserInfoCubit>()),
+        ),
+        BlocProvider(
+          create: (context) => VetCubit(
+            userInfoCubit: context.read<UserInfoCubit>(),
+            petCubit: context.read<PetCubit>(),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => TasksCubit(context.read<UserInfoCubit>()),
         ),
         BlocProvider(
           create: (context) => StoreCubit(context.read<UserInfoCubit>()),
