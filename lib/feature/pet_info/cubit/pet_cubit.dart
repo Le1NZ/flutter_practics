@@ -24,7 +24,7 @@ class PetCubit extends Cubit<PetState> {
 
   void createPet({required String name, required String type}) {
     final petInfo = PetInfo(name: name, type: type);
-    final petStatus = PetStatus(hungry: 50, happiness: 50);
+    final petStatus = PetStatus(hungry: 50, happiness: 50, health: 100);
     emit(PetState(petInfo: petInfo, petStatus: petStatus));
   }
 
@@ -37,28 +37,68 @@ class PetCubit extends Cubit<PetState> {
   void feed() {
     if (state.petStatus != null) {
       _userInfoCubit.spend(5);
+      final newHealth = (state.petStatus!.health + 2).clamp(0, 100);
+      
       emit(
         state.copyWith(
           petStatus: state.petStatus!.copyWith(
             hungry: state.petStatus!.hungry + 15,
             happiness: state.petStatus!.happiness - 5,
+            health: newHealth,
           ),
         ),
       );
+      
+      degradeHealth();
     }
   }
 
   void play() {
     if (state.petStatus != null) {
-      _userInfoCubit.earn(10);
+      int healthChange = -5;
+      
+      if (state.petStatus!.hungry < 30) {
+        healthChange = -15;
+      }
+
+      final newHealth = (state.petStatus!.health + healthChange).clamp(0, 100);
+
       emit(
         state.copyWith(
           petStatus: state.petStatus!.copyWith(
-            happiness: state.petStatus!.happiness + 10,
-            hungry: state.petStatus!.hungry - 7,
+            happiness: state.petStatus!.happiness + 15,
+            hungry: state.petStatus!.hungry - 10,
+            health: newHealth,
           ),
         ),
       );
+
+      degradeHealth();
+    }
+  }
+
+  void heal(int amount) {
+    if (state.petStatus != null) {
+      emit(state.copyWith(
+        petStatus: state.petStatus!.copyWith(
+          health: state.petStatus!.health + amount,
+        ),
+      ));
+    }
+  }
+
+  void degradeHealth() {
+     if (state.petStatus != null) {
+      int damage = 0;
+      if (state.petStatus!.hungry < 20) damage += 5;
+      if (state.petStatus!.happiness < 20) damage += 5;
+      
+      if (damage > 0) {
+         final newHealth = (state.petStatus!.health - damage).clamp(0, 100);
+         emit(state.copyWith(
+          petStatus: state.petStatus!.copyWith(health: newHealth)
+         ));
+      }
     }
   }
 

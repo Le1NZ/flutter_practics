@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_project/feature/store/cubit/store_cubit.dart';
 import 'package:flutter_project/feature/pet_info/cubit/user_info_cubit.dart';
+import 'package:flutter_project/feature/tasks/tasks.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/components/progress_bar.dart';
@@ -23,6 +24,19 @@ class PetInfoContainer extends StatelessWidget {
     context.push('/pet-settings');
   }
 
+  void _onNavigateToVetPressed(BuildContext context) {
+    context.push('/vet');
+    context.read<TasksCubit>().visitVet();
+  }
+
+  void _onNavigateToTasksPressed(BuildContext context) {
+    context.push('/tasks');
+  }
+
+  void _onNavigateToMinigamePressed(BuildContext context) {
+    context.push('/minigame');
+  }
+
   void _checkGameState(BuildContext context) {
     final petState = context.read<PetCubit>().state;
     final userInfoState = context.read<UserInfoCubit>().state;
@@ -30,15 +44,17 @@ class PetInfoContainer extends StatelessWidget {
 
     if (petState.petStatus == null) return;
 
-    // Lose condition
+    if (petState.petStatus != null && (petState.petStatus!.hungry < 20 || petState.petStatus!.happiness < 20)) {
+    }
+
     if (petState.petStatus!.hungry <= 0 ||
         petState.petStatus!.happiness <= 0 ||
+        petState.petStatus!.health <= 0 ||
         userInfoState.money <= 0) {
       _onNavigateToEndGame(context, false);
       return;
     }
 
-    // Win condition
     final allItemsBought = storeState.items.every((item) => item.wasBought);
     if (allItemsBought &&
         petState.petStatus!.hungry >= 90 &&
@@ -107,18 +123,38 @@ class PetInfoContainer extends StatelessWidget {
         ProgressBar(value: petState.petStatus!.hungry),
         _helpText("Счастье:"),
         ProgressBar(value: petState.petStatus!.happiness),
+        _helpText("Здоровье:"),
+        ProgressBar(value: petState.petStatus!.health, color: Colors.red),
         ElevatedButton(
-          onPressed: () => context.read<PetCubit>().feed(),
+          onPressed: () {
+             context.read<PetCubit>().feed();
+             context.read<TasksCubit>().incrementFeed();
+          },
           child: const Text('Покормить'),
         ),
         ElevatedButton(
-          onPressed: () => context.read<PetCubit>().play(),
+          onPressed: () {
+            context.read<PetCubit>().play();
+            context.read<TasksCubit>().incrementPlay();
+          },
           child: const Text('Поиграть'),
         ),
         const SizedBox(height: 40),
         ElevatedButton(
           onPressed: () => _onNavigateToStorePressed(context),
           child: const Text('В магазин'),
+        ),
+        ElevatedButton(
+          onPressed: () => _onNavigateToVetPressed(context),
+          child: const Text('Ветклиника'),
+        ),
+        ElevatedButton(
+          onPressed: () => _onNavigateToTasksPressed(context),
+          child: const Text('Задания'),
+        ),
+        ElevatedButton(
+          onPressed: () => _onNavigateToMinigamePressed(context),
+          child: const Text('Мини-игра'),
         ),
         ElevatedButton(
           onPressed: () => _onNavigateToSettingsPressed(context),

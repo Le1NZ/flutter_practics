@@ -67,6 +67,23 @@ class CreatePetScreen extends StatelessWidget {
         _helpText('Выберите тип питомца:'),
         _dropdownMenu(context, state),
         _petImage(state.petTypes[state.selectedPetIndex].imageUrl),
+        const SizedBox(height: 20),
+        const Card(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Как играть:", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                SizedBox(height: 8),
+                Text("ПОБЕДА: Купите все предметы в магазине и держите показатели сытости и счастья выше 90."),
+                SizedBox(height: 8),
+                Text("ПРОИГРЫШ: Если здоровье, сытость, счастье или деньги упадут до 0."),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
         ElevatedButton(
           onPressed: () => _onCreatePetPressed(context),
           child: const Text('Создать питомца'),
